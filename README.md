@@ -1,3 +1,5 @@
+# FileTransfer
+
 ### 一、声明权限
 Wifi P2P 技术并不会访问网络，但由于会使用到 **Java Socket**，所以需要申请网络权限。此外，由于是要实现文件互传，所以也需要申请SD卡读写权限。
 
@@ -94,13 +96,7 @@ public interface DirectActionListener extends WifiP2pManager.ChannelListener {
 所以，整个广播接收器使用到的所有代码是：
 
 ```java
-/**
- * 作者：leavesC
- * 时间：2019/2/27 23:58
- * 描述：
- * GitHub：https://github.com/leavesC
- * Blog：https://www.jianshu.com/u/9df45b87cfdf
- */
+
 public class DirectBroadcastReceiver extends BroadcastReceiver {
 
     private static final String TAG = "DirectBroadcastReceiver";
@@ -484,13 +480,7 @@ private String getPath(Context context, Uri uri) {
 ```
 文件的发送操作放到 AsyncTask 中处理，将服务器端的IP地址作为参数传进来，在正式发送文件前，先发送包含文件信息（文件名，文件大小，文件MD5码）的信息模型 FileTransfer ，并在发送文件的过程中同时更新进度
 ```java
-/**
- * 作者：leavesC
- * 时间：2019/2/27 23:56
- * 描述：客户端发送文件
- * GitHub：https://github.com/leavesC
- * Blog：https://www.jianshu.com/u/9df45b87cfdf
- */
+
 public class WifiClientTask extends AsyncTask<String, Integer, Boolean> {
 
     private ProgressDialog progressDialog;
@@ -605,13 +595,7 @@ public class WifiClientTask extends AsyncTask<String, Integer, Boolean> {
 传输文件的完整性主要是通过计算文件的MD5码值来保证了，在发送文件前，即在 WifiClientTask 的 doInBackground 方法中进行计算，将MD5码值赋给 FileTransfer 模型，通过如下方法计算得到
 
 ```java
-/**
- * 作者：leavesC
- * 时间：2019/2/27 23:57
- * 描述：
- * GitHub：https://github.com/leavesC
- * Blog：https://www.jianshu.com/u/9df45b87cfdf
- */
+
 public class Md5Util {
 
     public static String getMd5(File file) {
@@ -654,5 +638,3 @@ public class Md5Util {
     }
 
 }
-
-以上说明引用自简书：https://www.jianshu.com/p/f5d66e15fbdf
