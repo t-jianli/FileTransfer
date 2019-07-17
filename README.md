@@ -1,7 +1,20 @@
 # FileTransfer
 发送方：
-<video src="https://github.com/t-jianli/FileTransfer/发送方.mp4" width="320" height="180"
-controls="controls"></video>
+    <video id="video" controls="" preload="none"
+        poster="http://media.w3.org/2010/05/sintel/poster.png">
+         <source id="mp4" src="http://media.w3.org/2010/05/sintel/trailer.mp4" 
+             type="video/mp4">
+          <source id="webm" src="http://media.w3.org/2010/05/sintel/trailer.webm" 
+              type="video/webm">
+          <source id="ogv" src="http://media.w3.org/2010/05/sintel/trailer.ogv" 
+              type="video/ogg">
+          <p>Your user agent does not support the HTML5 Video element.</p>
+    </video>
+
+作者：fanlehai
+链接：https://www.jianshu.com/p/8e1c398112c4
+来源：简书
+简书著作权归作者所有，任何形式的转载都请联系作者获得授权并注明出处。
 接收方：
 width="720" height="480" src="接收方.mp4" allowfullscreen=""> 
 ### 一、声明权限
