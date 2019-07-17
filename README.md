@@ -1,22 +1,5 @@
 # FileTransfer
-发送方：
-    <video id="video" controls="" preload="none"
-        poster="http://media.w3.org/2010/05/sintel/poster.png">
-         <source id="mp4" src="http://media.w3.org/2010/05/sintel/trailer.mp4" 
-             type="video/mp4">
-          <source id="webm" src="http://media.w3.org/2010/05/sintel/trailer.webm" 
-              type="video/webm">
-          <source id="ogv" src="http://media.w3.org/2010/05/sintel/trailer.ogv" 
-              type="video/ogg">
-          <p>Your user agent does not support the HTML5 Video element.</p>
-    </video>
 
-作者：fanlehai
-链接：https://www.jianshu.com/p/8e1c398112c4
-来源：简书
-简书著作权归作者所有，任何形式的转载都请联系作者获得授权并注明出处。
-接收方：
-width="720" height="480" src="接收方.mp4" allowfullscreen=""> 
 ### 一、声明权限
 Wifi P2P 技术并不会访问网络，但由于会使用到 **Java Socket**，所以需要申请网络权限。此外，由于是要实现文件互传，所以也需要申请SD卡读写权限。
 
@@ -656,4 +639,3 @@ public class Md5Util {
 
 }
 
-以上引用自简书：https://www.jianshu.com/p/f5d66e15fbdf
