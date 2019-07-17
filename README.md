@@ -1,6 +1,6 @@
 # FileTransfer
 发送方：
-<video src="发送方.mp4" width="320" height="180"
+<video src="https://github.com/t-jianli/FileTransfer/发送方.mp4" width="320" height="180"
 controls="controls"></video>
 接收方：
 width="720" height="480" src="接收方.mp4" allowfullscreen=""> 
