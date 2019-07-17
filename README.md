@@ -1,5 +1,9 @@
 # FileTransfer
-
+发送方：
+<video src="发送方.mp4" width="320" height="180"
+controls="controls"></video>
+接收方：
+width="720" height="480" src="接收方.mp4" allowfullscreen=""> 
 ### 一、声明权限
 Wifi P2P 技术并不会访问网络，但由于会使用到 **Java Socket**，所以需要申请网络权限。此外，由于是要实现文件互传，所以也需要申请SD卡读写权限。
 
