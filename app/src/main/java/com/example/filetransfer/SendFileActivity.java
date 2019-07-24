@@ -49,6 +49,8 @@ public class SendFileActivity extends BaseActivity implements DirectActionListen
 
     private boolean mWifiP2pEnabled = false;
 
+    private boolean P2pConnectState = false;
+
     private WifiP2pManager.Channel mChannel;
 
     private TextView tv_myDeviceName;
@@ -77,6 +79,8 @@ public class SendFileActivity extends BaseActivity implements DirectActionListen
 
     public static final int CHOOSE_PHOTO = 1;
 
+    private Uri getFileUri;
+
     private View.OnClickListener clickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -86,13 +90,13 @@ public class SendFileActivity extends BaseActivity implements DirectActionListen
                     break;
                 }
                 case R.id.btn_chooseFile: {
-                    selectFile(v);
+                    selectFile();
                 }
             }
         }
     };
 
-    public void selectFile(View view) {
+    public void selectFile() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             //未授权，申请授权(从相册选择图片需要读取存储卡的权限)
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, CHOOSE_PHOTO);
@@ -129,6 +133,8 @@ public class SendFileActivity extends BaseActivity implements DirectActionListen
         mChannel = mWifiP2pManager.initialize(this, getMainLooper(), this);
         broadcastReceiver = new DirectBroadcastReceiver(mWifiP2pManager, mChannel, this);
         registerReceiver(broadcastReceiver, DirectBroadcastReceiver.getIntentFilter());
+        //selectFile();
+        //wifiP2pDeviceList.get(0);
     }
 
     private void initView() {
@@ -150,6 +156,7 @@ public class SendFileActivity extends BaseActivity implements DirectActionListen
             public void onItemClick(int position) {
                 mWifiP2pDevice = wifiP2pDeviceList.get(position);
                 showToast(wifiP2pDeviceList.get(position).deviceName);
+                //sendfile();
                 connect();
             }
         });
@@ -167,33 +174,72 @@ public class SendFileActivity extends BaseActivity implements DirectActionListen
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CHOOSE_PHOTO && resultCode == RESULT_OK && null != data) {
+            getFileUri = data.getData();
+        }
+        transferFileOnBackUp(getFileUri);
+//        if (requestCode == CHOOSE_PHOTO && resultCode == RESULT_OK && null != data) {
+//
+//            Uri uri = data.getData();
+//            String[] filePathColumn = { MediaStore.Images.Media.DATA };
+//            //获取选择照片的数据视图
+//            Cursor cursor = getContentResolver().query(uri, filePathColumn, null, null, null);
+//            cursor.moveToFirst();
+//            //从数据视图中获取已选择图片的路径
+//            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+//            String picturePath = cursor.getString(columnIndex);
+//            cursor.close();
+//            if(uri!=null){
+//                String path = getPath(this,uri);
+//                if(path!=null){
+//                    //将图片显示到界面上
+//                    ImageView imageView = (ImageView) findViewById(R.id.imageView);
+//                    imageView.setImageBitmap(BitmapFactory.decodeFile(path));
+//                    File file = new File(path);
+//                    if (file.exists() && wifiP2pInfo != null) {
+//                        FileTransfer fileTransfer = new FileTransfer(file.getPath(), file.length());
+//                        Log.e(TAG, "待发送的文件：" + fileTransfer);
+//                        new WifiClientTask(this, fileTransfer).execute(wifiP2pInfo.groupOwnerAddress.getHostAddress());
+//                    }
+//                }
+//            }
+//
+//        }
 
-            Uri uri = data.getData();
-            String[] filePathColumn = { MediaStore.Images.Media.DATA };
-            //获取选择照片的数据视图
-            Cursor cursor = getContentResolver().query(uri, filePathColumn, null, null, null);
-            cursor.moveToFirst();
-            //从数据视图中获取已选择图片的路径
-            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            String picturePath = cursor.getString(columnIndex);
-            cursor.close();
-            if(uri!=null){
-                String path = getPath(this,uri);
-                if(path!=null){
-                    //将图片显示到界面上
-                    ImageView imageView = (ImageView) findViewById(R.id.imageView);
-                    imageView.setImageBitmap(BitmapFactory.decodeFile(path));
-                    File file = new File(path);
-                    if (file.exists() && wifiP2pInfo != null) {
-                        FileTransfer fileTransfer = new FileTransfer(file.getPath(), file.length());
-                        Log.e(TAG, "待发送的文件：" + fileTransfer);
-                        new WifiClientTask(this, fileTransfer).execute(wifiP2pInfo.groupOwnerAddress.getHostAddress());
-                    }
+    }
+
+    private boolean transferFileOnBackUp(Uri uri){
+        String[] filePathColumn = { MediaStore.Images.Media.DATA };
+        //获取选择照片的数据视图
+        Cursor cursor = getContentResolver().query(uri, filePathColumn, null, null, null);
+        cursor.moveToFirst();
+        //从数据视图中获取已选择图片的路径
+        int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+        String picturePath = cursor.getString(columnIndex);
+        cursor.close();
+        if(uri!=null){
+            String path = getPath(this,uri);
+            if(path!=null){
+                //将图片显示到界面上
+                ImageView imageView = (ImageView) findViewById(R.id.imageView);
+                imageView.setImageBitmap(BitmapFactory.decodeFile(path));
+                File file = new File(path);
+                if (file.exists() && wifiP2pInfo != null) {
+                    FileTransfer fileTransfer = new FileTransfer(file.getPath(), file.length());
+                    Log.e(TAG, "待发送的文件：" + fileTransfer);
+                    new WifiClientTask(this, fileTransfer).execute(wifiP2pInfo.groupOwnerAddress.getHostAddress());
                 }
             }
-
         }
 
+        return true;
+    }
+
+    private boolean sendfile(){
+        if(!isP2pConnectState()){
+            connect();
+        }
+        transferFileOnBackUp(getFileUri);
+        return true;
     }
 
     private void connect() {
@@ -236,47 +282,43 @@ public class SendFileActivity extends BaseActivity implements DirectActionListen
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.action, menu);
+        getMenuInflater().inflate(R.menu.action2, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menuDirectEnable: {
-                if (mWifiP2pManager != null && mChannel != null) {
-                    startActivity(new Intent(android.provider.Settings.ACTION_WIFI_SETTINGS));
-                } else {
-                    showToast("当前设备不支持Wifi Direct");
-                }
-                return true;
-            }
-            case R.id.menuDirectDiscover: {
-                if (!mWifiP2pEnabled) {
-                    showToast("需要先打开Wifi");
-                    return true;
-                }
-                loadingDialog.show("正在搜索附近设备", true, false);
-                wifiP2pDeviceList.clear();
-                deviceAdapter.notifyDataSetChanged();
-                //搜寻附近带有 Wi-Fi P2P 的设备
-                mWifiP2pManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
-                    @Override
-                    public void onSuccess() {
-                        showToast("Success");
-                    }
-
-                    @Override
-                    public void onFailure(int reasonCode) {
-                        showToast("Failure");
-                        loadingDialog.cancel();
-                    }
-                });
-                return true;
+            case R.id.menuDirectDiscover_: {
+                searchNearbyDevice();
             }
             default:
                 return true;
         }
+    }
+
+    private boolean searchNearbyDevice(){
+        if (!mWifiP2pEnabled) {
+            showToast("需要先打开Wifi");
+            return true;
+        }
+        loadingDialog.show("正在搜索附近设备", true, true);
+        wifiP2pDeviceList.clear();
+        deviceAdapter.notifyDataSetChanged();
+        //搜寻附近带有 Wi-Fi P2P 的设备
+        mWifiP2pManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+                showToast("Success");
+            }
+
+            @Override
+            public void onFailure(int reasonCode) {
+                showToast("Failure");
+                loadingDialog.cancel();
+            }
+        });
+        return true;
     }
 
     @Override
@@ -288,6 +330,7 @@ public class SendFileActivity extends BaseActivity implements DirectActionListen
 
     @Override
     public void onConnectionInfoAvailable(WifiP2pInfo wifiP2pInfo) {
+        setP2pConnectStateEnable();
         dismissLoadingDialog();
         wifiP2pDeviceList.clear();
         deviceAdapter.notifyDataSetChanged();
@@ -306,10 +349,9 @@ public class SendFileActivity extends BaseActivity implements DirectActionListen
             stringBuilder.append(mWifiP2pDevice.deviceAddress);
         }
         stringBuilder.append("\n");
-        stringBuilder.append("是否群主：");
-        stringBuilder.append(wifiP2pInfo.isGroupOwner ? "是群主" : "非群主");
-        stringBuilder.append("\n");
-        stringBuilder.append("群主IP地址：");
+//        stringBuilder.append(wifiP2pInfo.isGroupOwner ? "接收方" : "发送方");
+//        stringBuilder.append("\n");
+        stringBuilder.append("接收方IP地址：");
         stringBuilder.append(wifiP2pInfo.groupOwnerAddress.getHostAddress());
         tv_status.setText(stringBuilder);
         if (wifiP2pInfo.groupFormed && !wifiP2pInfo.isGroupOwner) {
@@ -323,8 +365,9 @@ public class SendFileActivity extends BaseActivity implements DirectActionListen
     @Override
     public void onDisconnection() {
         Log.e(TAG, "onDisconnection");
-        btn_disconnect.setEnabled(false);
-        btn_chooseFile.setEnabled(false);
+        //btn_disconnect.setEnabled(false);
+        //btn_chooseFile.setEnabled(false);
+        setP2pConnectStateDisable();
         showToast("已断开连接");
         wifiP2pDeviceList.clear();
         deviceAdapter.notifyDataSetChanged();
@@ -373,4 +416,15 @@ public class SendFileActivity extends BaseActivity implements DirectActionListen
         return null;
     }
 
+    public boolean isP2pConnectState() {
+        return P2pConnectState;
+    }
+
+    public void setP2pConnectStateEnable() {
+        P2pConnectState = true;
+    }
+
+    public void setP2pConnectStateDisable() {
+        P2pConnectState = false;
+    }
 }

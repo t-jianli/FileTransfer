@@ -1,11 +1,13 @@
 package com.example.filetransfer;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pInfo;
@@ -15,6 +17,9 @@ import android.os.Environment;
 import android.os.IBinder;
 import android.os.storage.StorageManager;
 import android.os.storage.StorageVolume;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -85,9 +90,9 @@ public class ReceiveFileActivity extends BaseActivity implements DirectActionLis
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    progressDialog.setMessage("文件名： " + new File(fileTransfer.getFilePath()).getName());
-                    progressDialog.setProgress(progress);
-                    progressDialog.show();
+//                    progressDialog.setMessage("文件名： " + new File(fileTransfer.getFilePath()).getName());
+//                    progressDialog.setProgress(progress);
+//                    progressDialog.show();
                 }
             });
         }
@@ -97,7 +102,7 @@ public class ReceiveFileActivity extends BaseActivity implements DirectActionLis
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    progressDialog.cancel();
+                    //progressDialog.cancel();
                     if (file != null && file.exists()) {
                         openFile(file.getPath());
                     }
@@ -117,13 +122,15 @@ public class ReceiveFileActivity extends BaseActivity implements DirectActionLis
         channel = wifiP2pManager.initialize(this, getMainLooper(), this);
         broadcastReceiver = new DirectBroadcastReceiver(wifiP2pManager, channel, this);
         registerReceiver(broadcastReceiver, DirectBroadcastReceiver.getIntentFilter());
+        removeGroup();
+        createGroup();
         bindService();
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        progressDialog.setCancelable(false);
-        progressDialog.setCanceledOnTouchOutside(false);
-        progressDialog.setTitle("正在接收文件");
-        progressDialog.setMax(100);
+//        progressDialog = new ProgressDialog(this);
+//        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+//        progressDialog.setCancelable(false);
+//        progressDialog.setCanceledOnTouchOutside(false);
+//        progressDialog.setTitle("正在接收文件");
+//        progressDialog.setMax(100);
     }
 
     private void initView() {
@@ -211,7 +218,32 @@ public class ReceiveFileActivity extends BaseActivity implements DirectActionLis
         Log.e(TAG, "onChannelDisconnected");
     }
 
-    public void createGroup(View view) {
+    public void createGroup() {
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CHANGE_WIFI_STATE) != PackageManager.PERMISSION_GRANTED) {
+            //未授权，申请授权(改变WiFi状态)
+            Log.e(TAG, "apply change WiFi state perm");
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+        } else {
+            //已授权
+            Log.e(TAG, "有权限，无需申请");
+            createGroup1();
+        }
+    }
+
+    /**
+     权限申请结果回调
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case 1:   //改变WiFi状态权限申请返回
+                createGroup1();
+                break;
+        }
+    }
+
+    private void createGroup1(){
         showLoadingDialog("正在创建群组");
         wifiP2pManager.createGroup(channel, new WifiP2pManager.ActionListener() {
             @Override
@@ -225,32 +257,10 @@ public class ReceiveFileActivity extends BaseActivity implements DirectActionLis
             public void onFailure(int reason) {
                 Log.e(TAG, "createGroup onFailure: " + reason);
                 dismissLoadingDialog();
-                showToast("onFailure");
+                showToast("createGroup onFailure");
             }
         });
     }
-
-//    public void createGroup(View view) {
-//        if (!mWifiP2pEnabled) {
-//            showToast("需要先打开Wifi");
-//            return ;
-//        }
-//        loadingDialog.show("正在等待其他设备连接", true, false);
-//        wifiP2pDeviceList.clear();
-//        deviceAdapter.notifyDataSetChanged();
-//        wifiP2pManager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
-//            @Override
-//            public void onSuccess() {
-//                showToast("Success");
-//            }
-//
-//            @Override
-//            public void onFailure(int reasonCode) {
-//                showToast("Failure");
-//                loadingDialog.cancel();
-//            }
-//        });
-//    }
 
     public void removeGroup(View view) {
         removeGroup();
@@ -265,14 +275,14 @@ public class ReceiveFileActivity extends BaseActivity implements DirectActionLis
         wifiP2pManager.removeGroup(channel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
-                Log.e(TAG, "removeGroup onSuccess");
-                showToast("onSuccess");
+                Log.e(TAG, "退出成功！");
+                //showToast("removeGroup onSuccess");
             }
 
             @Override
             public void onFailure(int reason) {
                 Log.e(TAG, "removeGroup onFailure");
-                showToast("onFailure");
+                //showToast("removeGroup onFailure");
             }
         });
     }

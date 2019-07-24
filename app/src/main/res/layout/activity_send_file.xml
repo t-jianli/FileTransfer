@@ -70,12 +70,6 @@
         android:textSize="18sp"
         tools:text="文件发送列表" />
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="device state" />
-
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="match_parent"

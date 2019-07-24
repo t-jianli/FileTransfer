@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.5" />
+        app:layout_constraintGuide_percent="0.45" />
 
     <Button
         android:layout_width="match_parent"
@@ -24,6 +24,7 @@
         app:layout_constraintRight_toRightOf="parent" />
 
     <Button
+        android:id="@+id/button2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
@@ -34,3 +35,4 @@
         app:layout_constraintTop_toBottomOf="@id/guideline" />
 
 </android.support.constraint.ConstraintLayout>
+

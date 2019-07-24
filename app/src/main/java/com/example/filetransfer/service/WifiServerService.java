@@ -93,8 +93,8 @@ public class WifiServerService extends IntentService {
             int currentapiVersion=android.os.Build.VERSION.SDK_INT;
             Log.e(TAG,"current device version:"+currentapiVersion);
 
-            //fileOutputStream = new FileOutputStream(file);
-            fileOutputStream = DocumentsUtils.getOutputStream(this,file);
+            fileOutputStream = new FileOutputStream(file);
+            //fileOutputStream = DocumentsUtils.getOutputStream(this,file);
 
             byte buf[] = new byte[512];
             int len;

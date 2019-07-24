@@ -6,17 +6,17 @@
     android:orientation="vertical"
     tools:context=".ReceiveFileActivity">
 
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="createGroup"
-        android:text="创建群组" />
+    <!--<Button-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:onClick="createGroup"-->
+        <!--android:text="创建群组" />-->
 
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="removeGroup"
-        android:text="移除群组" />
+    <!--<Button-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:onClick="removeGroup"-->
+        <!--android:text="移除群组" />-->
 
     <TextView
         android:layout_width="match_parent"
